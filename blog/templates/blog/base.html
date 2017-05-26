@@ -5,7 +5,7 @@
         <title>Ruby in the Wild!</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
-        <link href="https://fonts.googleapis.com/css?family=Amatic+SC:700|Permanent+Marker|Rock+Salt" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Amatic+SC:700|Rock+Salt" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/blog.css' %}">
 
     </head>
@@ -14,15 +14,18 @@
             {% if user.is_authenticated %}
                 <a href="{% url 'post_new' %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
                 <a href="{% url 'post_draft_list' %}" class="top-menu"><span class="glyphicon glyphicon-edit"></span></a>
+                <p class="top-menu">Hello {{ user.username }} (<small><a href="{% url 'logout' %}">Log out</a></small>)</p>
             {% endif %}
             <h1><a href="/">Ruby in the Wild!</a></h1>
-            <h1>user: {{ user }}</h1>
         </div>
         <div class="content container">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-16">
                     {% block content %}
                     {% endblock %}
+                </div>
+                <div class="col-md-8">
+                    
                 </div>
             </div>
         </div>
