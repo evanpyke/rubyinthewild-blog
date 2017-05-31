@@ -3,12 +3,33 @@
 {% block content %}
     {% for post in posts %}
         <div class="post">
-            <div class="date">
-                <p>published: {{ post.published_date }}</p>
+            <div class="col-sm-8">
+                <h1><a href="{{ post.get_absolute_url }}">{{ post.title }}</a><small>  {{ post.published_date|timesince }} ago</small></h1>
+                <p>{{ post.text|linebreaksbr }}</p>
+                <a href="{{ post.get_absolute_url }}">Comments: {{ post.comments.count }}</a>
             </div>
-            <h1><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h1>
-            <p>{{ post.text|linebreaksbr }}</p>
-            <a href="{% url 'post_detail' pk=post.pk %}">Comments: {{ post.comments.count }}</a>
         </div>
     {% endfor %}
+
+    <div class="col-sm-12 col-sm-offset-3">
+        <div class="pagination">
+            <span class="step=links">
+                {% if posts.has_previous %}
+                    <a href="?page={{ posts.previous_page_number }}">prev</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ posts.number }} of {{ posts.paginator.num_pages}}
+                </span>
+
+                {% if posts.has_next %}
+                    <a href="?page={{ posts.next_page_number }}">next</a>
+                {% endif %}
+            </span>
+
+        </div>
+
+    </div>
+
+
 {% endblock %}

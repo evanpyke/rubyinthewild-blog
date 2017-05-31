@@ -10,13 +10,9 @@ class Post(models.Model):
     slug = models.SlugField(unique=True, editable=False)
     text = models.TextField()
     trip_date = models.DateTimeField(default=timezone.now)
-    published_date = models.DateTimeField(
-        blank=True,
-        null=True
+    updated_date = models.DateTimeField(blank=True, null=True)
+    published_date = models.DateTimeField(blank=True, null=True
         )
-
-    def get_absolute_url(self):
-        return reverse("posts:detail", kwargs={"slug":self.slug})
 
     def publish(self):
         self.published_date = timezone.now()
@@ -24,6 +20,10 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("post:detail", kwargs={"pk":self.pk})
+
 
 class Comment(models.Model):
     post = models.ForeignKey('blog.Post', related_name='comments')
