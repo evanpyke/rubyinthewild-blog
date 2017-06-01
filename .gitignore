@@ -3,5 +3,6 @@
 __pycache__
 myvenv
 */settings_secret.py
-/static
+/static/*
+/media/*
 .DS_Store
