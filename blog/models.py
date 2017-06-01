@@ -8,9 +8,8 @@ from django.utils.text import slugify
 
 
 def upload_location(post, filename):
-    # ext = os.path.splitext(filename)[-1]
-    # return "%s/%s.%s" %(post.pk, post.slug, ext)
-    return "%s/%s" %(post.pk, filename)
+    ext = os.path.splitext(filename)[-1]
+    return "%s/%s%s" %(post.pk, post.slug, ext)
 
 class Post(models.Model):
     author = models.ForeignKey('auth.User')
@@ -26,9 +25,8 @@ class Post(models.Model):
     width_field = models.IntegerField(default=0)
     slug = models.SlugField(unique=True, editable=False)
     text = models.TextField()
-    trip_date = models.DateTimeField(default=timezone.now)
-    updated_date = models.DateTimeField(blank=True, null=True)
-    published_date = models.DateTimeField(blank=True, null=True)
+    created_date = models.DateField(default=timezone.now)
+    published_date = models.DateField(blank=True, null=True)
 
     def publish(self):
         self.published_date = timezone.now()
@@ -38,7 +36,7 @@ class Post(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("post:detail", kwargs={"pk":self.pk})
+        return reverse("post:detail", kwargs={"slug":self.slug})
 
 
 class Comment(models.Model):
@@ -59,10 +57,10 @@ def create_slug(instance, new_slug=None):
     slug = slugify(instance.title)
     if new_slug is not None:
         slug = new_slug
-    qs = Post.objects.filter(slug=slug)
+    qs = Post.objects.filter(slug=slug).order_by("-pk")
     exists = qs.exists()
     if exists:
-        new_slug = "%s-%s" %(slug, qs.first().id)
+        new_slug = "%s-%s" %(slug, qs.first().pk)
         return create_slug(instance, new_slug=new_slug)
     return slug
 

@@ -8,12 +8,12 @@
                     {{ post.published_date }}
                 </div>
             {% else %}
-                <a class="btn btn-default" href="{% url 'post:post_publish' pk=post.pk %}">Publish</a>
+                <a class="btn btn-default" href="{% url 'post:publish' slug=post.slug %}">Publish</a>
             {% endif %}
-            <a class="btn btn-default" href="{% url 'post:post_edit' pk=post.pk %}"><span class="glyphicon glyphicon-pencil"></span></a>
-            <a class="btn btn-default" href="{% url 'post:post_remove' pk=post.pk %}"><span class="glyphicon glyphicon-remove"></span></a>
+            <a class="btn btn-default" href="{% url 'post:edit' slug=post.slug %}"><span class="glyphicon glyphicon-pencil"></span></a>
+            <a class="btn btn-default" href="{% url 'post:remove' slug=post.slug %}"><span class="glyphicon glyphicon-remove"></span></a>
         {% endif %}
-        <div class="col-sm-12">
+
             {% if post.image %}
                 <img src="{{ post.image.url }}" class="img-responsive">
             {% endif %}
@@ -23,13 +23,13 @@
                 </div>
             <p>by: {{ post.author }}</p>
             <p>{{ post.text|linebreaksbr }}</p>
-        </div>
+
     </div>
 
     <hr>
     <div class="col-sm-12">
         
-        <a class="btn btn-default" href="{% url 'post:add_comment_to_post' pk=post.pk %}">Add comment</a>
+        <a class="btn btn-default" href="{% url 'post:comment' slug=post.slug %}">Add comment</a>
         {% for comment in post.comments.all %}
             <div class="comment">
                 <div class="date">{{ comment.created_date }}</div>
