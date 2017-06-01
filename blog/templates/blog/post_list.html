@@ -3,10 +3,17 @@
 {% block content %}
     {% for post in posts %}
         <div class="post">
-            <div class="col-sm-8">
-                <h1><a href="{{ post.get_absolute_url }}">{{ post.title }}</a><small>  {{ post.published_date|timesince }} ago</small></h1>
-                <p>{{ post.text|linebreaksbr }}</p>
-                <a href="{{ post.get_absolute_url }}">Comments: {{ post.comments.count }}</a>
+            <div class="col-sm-12">
+                <div class="thumbnail">
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" class="img-responsive">
+                    {% endif %}
+                    <div class="caption">
+                        <h1><a href="{{ post.get_absolute_url }}">{{ post.title }}</a><small>  {{ post.published_date|timesince }} ago</small></h1>
+                        <p>{{ post.text|linebreaksbr|truncatechars:150 }}</p>
+                        <a href="{{ post.get_absolute_url }}">Comments: {{ post.comments.count }}</a>
+                    </div>
+                </div>
             </div>
         </div>
     {% endfor %}

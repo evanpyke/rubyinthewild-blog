@@ -1,18 +1,34 @@
+import os.path
+
 from django.db import models
 from django.db.models.signals import pre_save
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 
+
+def upload_location(post, filename):
+    # ext = os.path.splitext(filename)[-1]
+    # return "%s/%s.%s" %(post.pk, post.slug, ext)
+    return "%s/%s" %(post.pk, filename)
+
 class Post(models.Model):
     author = models.ForeignKey('auth.User')
     title = models.CharField(max_length=100)
+    image = models.ImageField(
+        upload_to=upload_location,
+        null=True, 
+        blank=True,
+        width_field="width_field",
+        height_field="height_field",
+        )
+    height_field = models.IntegerField(default=0)
+    width_field = models.IntegerField(default=0)
     slug = models.SlugField(unique=True, editable=False)
     text = models.TextField()
     trip_date = models.DateTimeField(default=timezone.now)
     updated_date = models.DateTimeField(blank=True, null=True)
-    published_date = models.DateTimeField(blank=True, null=True
-        )
+    published_date = models.DateTimeField(blank=True, null=True)
 
     def publish(self):
         self.published_date = timezone.now()
