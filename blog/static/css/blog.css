@@ -33,9 +33,9 @@ h1, h2, h3, h4 {
     font-family: default;
 }
 
-.save {
+/*.save {
     float: right;
-}
+}*/
 
 .post-form textarea, .post-form input {
     width: 100%;

@@ -24,7 +24,15 @@
                     {% block content %}
                     {% endblock %}
                 </div>
-                <div class="col-md-4" style="background-color:lavender">instagram goes here</div>
+                <div class="col-md-4" style="background-color:lavender">instagram goes here
+
+                    <form method="GET">
+                        <input type="text" name="q" placeholder="Search" value="{{ request.GET.q }}">
+                        <input type="submit" value="Search">
+                    </form>
+                    {% block sidebar %}
+                    {% endblock %}
+                </div>
             </div>
         </div>
     </body>

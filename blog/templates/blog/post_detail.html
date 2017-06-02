@@ -23,6 +23,18 @@
                 </div>
             <p>by: {{ post.author }}</p>
             <p>{{ post.text|linebreaksbr }}</p>
+            <p>{% lorem %}</p>
+
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}">Facebook</a>
+
+            <a href="https://twitter.com/home?status={{ request.build_absolute_uri }}">Twitter</a>
+
+            <a href='https://plus.google.com/share?url={{ request.build_absolute_uri }}'>Google+</a>
+
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ post.title }}&summary={{ post.text }}&source={{ request.build_absolute_uri }}">Linkedin</a>
+
+            <a href="http://www.reddit.com/submit?url={{ request.build_absolute_uri }}&title={{ post.title }}">Reddit</a>
+
 
     </div>
 
@@ -41,4 +53,10 @@
         {% endfor %}
     </div>
     
+{% endblock %}
+
+{% block sidebar %}
+    <div class="col-sm-8">
+        {{ post.title }} pack list:
+    </div>
 {% endblock %}
