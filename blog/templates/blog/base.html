@@ -17,6 +17,12 @@
                 <p class="top-menu">Hello {{ user.username }} (<small><a href="{% url 'logout' %}">Log out</a></small>)</p>
             {% endif %}
             <h1><a href="/">Ruby in the Wild!</a></h1>
+            <form method="GET">
+                {% for activity in category %}
+                    <button type="submit" class="btn btn-link btn-lg" name="category" value="{{ activity.name }}">{{ activity.name }}</button>
+                {% endfor %}
+                <button type="submit" class="btn btn-link btn-lg" name="category" value="about">about</button>
+            </form>
         </div>
         <div class="content container">
             <div class="row">
@@ -24,14 +30,17 @@
                     {% block content %}
                     {% endblock %}
                 </div>
-                <div class="col-md-4" style="background-color:lavender">instagram goes here
+                <div class="col-md-4" style="background-color:lavender">
+
+                    {% block sidebar %}
+                    {% endblock %}
+
+
 
                     <form method="GET">
                         <input type="text" name="q" placeholder="Search" value="{{ request.GET.q }}">
                         <input type="submit" value="Search">
                     </form>
-                    {% block sidebar %}
-                    {% endblock %}
                 </div>
             </div>
         </div>

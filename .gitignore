@@ -1,6 +1,6 @@
 *.pyc
 *~
-*.sql*
+/sql_backups/*
 __pycache__
 myvenv
 */settings_secret.py

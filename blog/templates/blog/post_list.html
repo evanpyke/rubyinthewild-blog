@@ -6,12 +6,12 @@
             <div class="col-sm-10">
                 <div class="thumbnail">
                     <a href="{{ post.get_absolute_url }}">
-                                            <h1>{{ post.title }}<small>  {{ post.published_date }} </small></h1>
+                    <h1>{% if post.is_review %}Review: {% endif %}{{ post.title }}<small>  {{ post.published_date|date }} </small></h1>
+                    
                     {% if post.image %}
                         <img src="{{ post.image.url }}" class="img-responsive">
                     {% endif %}
                     <div class="caption">
-
                         <p>{{ post.text|linebreaksbr|truncatechars:150 }}</p>
                         <p>Comments: {{ post.comments.count }}</p>
                     </div>
@@ -41,5 +41,16 @@
 
     </div>
 
+
+{% endblock %}
+
+{% block sidebar %}
+    <div class="thumbnail">
+        <a href="{{ instagram.post }}" target="_blank">
+        <img src="{{ instagram.image }}">
+        {{ instagram.caption }}
+
+        </a>
+    </div>
 
 {% endblock %}

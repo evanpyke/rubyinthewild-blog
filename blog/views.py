@@ -5,8 +5,10 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import redirect, render, get_object_or_404
 from django.utils import timezone
+
 from .forms import PostForm, CommentForm
-from .models import Post, Comment
+from .models import Post, Comment, Category
+from .instagram_widget import *
 
 
 # Create your views here.
@@ -15,12 +17,31 @@ def post_list(request):
         published_date__lte=timezone.now()
         ).order_by('-published_date')
 
+    category_list = Category.objects.all()
+
+    inst = Instagram(instagram_url)
+
+    category_btn = request.GET.get('category')
+    if category_btn:
+        post_list = post_list.filter(
+            category__name__icontains=category_btn
+        ).distinct()
+
+    item_btn = request.GET.get('item')
+    if item_btn:
+        post_list = post_list.filter(
+            Q(post_type__name__icontains='review') &
+            Q(gear__short_name__icontains=item_btn)
+        ).distinct()
+
     query = request.GET.get('q')
     if query:
         post_list = post_list.filter(
             Q(title__icontains=query) |
             Q(text__icontains=query) |
-            Q(author__username__icontains=query)
+            Q(author__username__icontains=query) |
+            Q(category__name__icontains=query) |
+            Q(post_type__name__icontains=query)
         ).distinct()
 
     paginator = Paginator(post_list, 5)
@@ -33,14 +54,31 @@ def post_list(request):
         posts = paginator.page(paginator.num_pages)
 
 
-    return render(request, 'blog/post_list.html', {'posts': posts})
+    return render(request, 'blog/post_list.html', {'posts': posts, 'category': category_list, 'instagram': inst})
+
+def search_posts(request):
+    query = request.GET.get('q')
+    if query:
+        post_list = post_list.filter(
+            Q(title__icontains=query) |
+            Q(text__icontains=query) |
+            Q(author__username__icontains=query) |
+            Q(category__name__icontains=query) |
+            Q(post_type__name__icontains=query)
+        ).distinct()
+    return post_list
 
 def post_detail(request, post_type=None, slug=None):
     post = get_object_or_404(Post, post_type=post_type, slug=slug)
     if post.published_date == None and not request.user.is_staff:
         raise Http404
 
-    return render(request, 'blog/post_detail.html', {'post': post})
+    query = request.GET.get('item')
+    if query:
+        print(query)
+        return redirect('/')
+
+    return render(request, 'blog/post_detail.html', {'post': post,})
 
 @login_required
 def post_new(request):

@@ -1,12 +1,10 @@
 import os.path
 
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
-
-from .choices import *
 
 
 def upload_location(post, filename):
@@ -14,14 +12,12 @@ def upload_location(post, filename):
     return "%s/%s%s" %(post.pk, post.slug, ext)
 
 
-
-
 class Post(models.Model):
     author = models.ForeignKey('auth.User')
 
-    post_type = models.ForeignKey('Type')
+    post_type = models.ForeignKey('Type', to_field='name')
 
-    category = models.ForeignKey('Category')
+    category = models.ForeignKey('Category', null=True, blank=True)
 
     title = models.CharField(max_length=100)
     image = models.ImageField(
@@ -40,6 +36,9 @@ class Post(models.Model):
     published_date = models.DateTimeField(blank=True, null=True)
 
 
+    def __str__(self):
+        return self.title
+
     def publish(self, pub=True):
         if pub:
             self.published_date = timezone.now()
@@ -47,11 +46,19 @@ class Post(models.Model):
             self.published_date = None
         self.save()
 
-    def __str__(self):
-        return self.title
 
     def get_absolute_url(self):
         return reverse("post:detail", kwargs={"post_type":self.post_type, "slug":self.slug})
+
+    def is_review(self):
+        return str(self.post_type) == 'review'
+
+    def pack_list(self):
+        packlist = []
+        for item in self.gear.all():
+            packlist.append(item.short_name)
+        packlist = list(set(packlist))
+        return packlist
 
 
 class Comment(models.Model):
@@ -72,20 +79,32 @@ class Gear(models.Model):
     brand = models.CharField(max_length=20, blank=True)
     model = models.CharField(max_length=30, blank=True)
     short_name = models.CharField(max_length=50)
-    full_name = models.CharField(max_length=60)
-    category = models.ManyToManyField('Category')
+    full_name = models.CharField(max_length=60, editable=False)
+    category = models.ManyToManyField('Category', blank=True)
 
     def __str__(self):
         return self.full_name
 
+    def unique_short_names(self):
+        items = []
+        for item in self.objects.all():
+            items += str(item.short_name)
+        items = list(set(items))
+
+        return items
+
+    def review_url(self):
+        qs = Post.objects.filter(gear=self.pk, category='review')
+
+
 class Category(models.Model):
-    name = models.CharField(max_length=16)
+    name = models.CharField(max_length=16, primary_key=True)
     
     def __str__(self):
         return self.name
 
 class Type(models.Model):
-    name = models.CharField(max_length=16)
+    name = models.CharField(max_length=16, primary_key=True)
 
     def __str__(self):
         return self.name
@@ -102,17 +121,18 @@ def create_slug(instance, new_slug=None):
         return create_slug(instance, new_slug=new_slug)
     return slug
 
-
 def pre_save_post_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = create_slug(instance)
 
-def create_full_name(instance, new_name=None):
-    pass
+def post_save_post_receiver(sender, instance, *args, **kwargs):
+    category_gear = Gear.objects.filter(category=instance.category)
+    instance.gear = category_gear
 
 def pre_save_gear_receiver(sender, instance, *args, **kwargs):
-    if not instance.full_name:
-        instance.full_name = create_full_name(instance)
+    instance.full_name = str(instance.brand) + ' ' + str(instance.model)
+
 
 pre_save.connect(pre_save_post_receiver, sender=Post)
-# pre_save.connect(pre_save_gear_receiver, sender=Gear)
+post_save.connect(post_save_post_receiver, sender=Post)
+pre_save.connect(pre_save_gear_receiver, sender=Gear)
